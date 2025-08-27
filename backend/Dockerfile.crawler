@@ -1,0 +1,24 @@
+# Dockerfile.crawler
+FROM python:3.10-slim
+
+# 필요한 시스템 의존성 설치 (이전 단계에서 이미 추가)
+RUN apt-get update && apt-get install -y \
+    ffmpeg \
+    git \
+    build-essential \
+    libmagic1 \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# 작업 디렉터리 설정
+WORKDIR /app
+
+# uv를 사용하기 위해 필요한 라이브러리 설치
+RUN pip install uv
+
+# 🚨🚨 uv.lock과 pyproject.toml 파일을 모두 복사합니다. 🚨🚨
+COPY uv.lock .
+COPY pyproject.toml .
+
+# uv.lock 파일을 기반으로 패키지를 설치
+RUN uv sync

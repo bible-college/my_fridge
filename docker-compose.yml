@@ -44,7 +44,35 @@ services:
     volumes:
       - redis_data:/data
 
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.2
+    container_name: my_fridge_es
+    environment:
+      - xpack.security.enabled=false # 개발용으로 보안 비활성화
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
+  crawler:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.crawler
+    container_name: my_fridge_crawler
+    volumes:
+      - ./backend:/app
+    depends_on:
+      - es # 엘라스틱서치가 실행된 후에 크롤러가 시작되도록 설정     
+
 volumes:
   postgres_data:
   redis_data:
   uv_venv:
+  es_data:
