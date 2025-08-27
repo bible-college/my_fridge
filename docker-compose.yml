@@ -63,13 +63,14 @@ services:
 
   crawler:
     build:
-      context: ./backend
+      context: .
       dockerfile: Dockerfile.crawler
-    container_name: my_fridge_crawler
     volumes:
       - ./backend:/app
     depends_on:
-      - es # 엘라스틱서치가 실행된 후에 크롤러가 시작되도록 설정     
+      - db
+    env_file:
+      - .env   
 
 volumes:
   postgres_data:
